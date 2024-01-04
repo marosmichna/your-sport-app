@@ -10,7 +10,7 @@ export interface TennisPlayer {
     _id: string,
     playerFirstName: string,
     playerSecondName: string,
-    dateOfBirth: Date,
+    dateOfBirth: string,
     playerNote?: string,
     playerScore: number,
     playerWon: number,

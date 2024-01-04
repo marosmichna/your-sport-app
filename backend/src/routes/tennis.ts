@@ -22,6 +22,6 @@ router.get("/team/:tennisTeamId", TennisController.getTennisPlayers);
 
 router.post("/team/:tennisTeamId", TennisController.createTennisPlayer);
 
-router.patch("/team/:tennisTeamId/:tennisPlayerId", TennisController.updateTennisTeam);
+router.patch("/team/:tennisTeamId/:tennisPlayerId", TennisController.updateTennisPlayer);
 
 export default router;

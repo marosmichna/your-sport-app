@@ -143,7 +143,7 @@ export async function fetchTennisPlayers(tennisTeamId: string): Promise<TennisPl
 export interface TennisPlayerInput {
     playerFirstName: string,
     playerSecondName: string,
-    dateOfBirth: Date,
+    dateOfBirth: string,
     playerNote: string,
     playerScore: number,
     playerWon: number,
@@ -163,8 +163,8 @@ export async function createTennisPlayer(tennisTeamId: string, tennisPlayer: Ten
 }
 
 // Update Tennis Player
-export async function updateTennisPlayer(tennisPlayerId: string, tennisPlayer: TennisPlayerInput): Promise<TennisPlayer> {
-    const response = await fetchData("/your-sport/tennis/team/" + tennisPlayerId,
+export async function updateTennisPlayer(tennisTeamId: string, tennisPlayerId: string, tennisPlayer: TennisPlayerInput): Promise<TennisPlayer> {
+    const response = await fetchData(`/your-sport/tennis/team/${tennisTeamId}/${tennisPlayerId}`,
         {
             method: "PATCH",
             headers: {

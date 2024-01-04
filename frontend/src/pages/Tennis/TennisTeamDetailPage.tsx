@@ -5,6 +5,8 @@ import { Button, Container, Spinner, Table } from 'react-bootstrap';
 import { TennisPlayer as TennisPlayerModel } from '../../models/tennis';
 import * as SportApi from "../../network/sports_api";
 import AddEditTennisPlayerDialog from '../../components/Tennis/AddEditTennisPlayerDialog';
+import { formatBirthDate } from "../../utils/formatDate"
+
 
 interface TennisTeamDetailPageProps {
   loggedInUser: User | null,
@@ -22,6 +24,7 @@ const TennisTeamDetailPage = ({ loggedInUser }: TennisTeamDetailPageProps) => {
     _id,
   } = state;
 
+  
   const [tennisPlayers, setTennisPlayers] = useState<TennisPlayerModel[]>([]);
   const [tennisPlayersLoading, setTennisPlayersLoading] = useState(true);
   const [showTennisPlayersLoadingError, setShowTennisPlayersLoadingError] = useState(false);
@@ -45,6 +48,14 @@ const TennisTeamDetailPage = ({ loggedInUser }: TennisTeamDetailPageProps) => {
     loadTennisPlayers();
   }, [])
 
+  const handleEditClick = (tennisPlayer: TennisPlayerModel) => {
+    setTennisPlayerToEdit(tennisPlayer);
+  };
+
+  console.log(tennisPlayers)
+
+  
+
   const tennisPlayerTable =
     <Table>
       <thead>
@@ -54,7 +65,8 @@ const TennisTeamDetailPage = ({ loggedInUser }: TennisTeamDetailPageProps) => {
             <th>Second Name</th>             
             <th>Score</th>             
             <th>Won</th>             
-            <th>Lost</th>             
+            <th>Lost</th> 
+            <th>Date of birth</th>            
         </tr>
       </thead>
       {
@@ -67,6 +79,13 @@ const TennisTeamDetailPage = ({ loggedInUser }: TennisTeamDetailPageProps) => {
                 <td>{tennisPlayer.playerScore}</td>
                 <td>{tennisPlayer.playerWon}</td>
                 <td>{tennisPlayer.playerLost}</td>
+                <td>{formatBirthDate(tennisPlayer.dateOfBirth)}</td>
+
+                <Button 
+                  onClick={() => handleEditClick(tennisPlayer)}
+                >
+                  Update
+                </Button>
             </tr>
           </tbody>      
         ))
@@ -103,14 +122,30 @@ const TennisTeamDetailPage = ({ loggedInUser }: TennisTeamDetailPageProps) => {
           }
         </>
     }
-    {
+
+      {
       showAddTennisPlayersDialog && 
       <AddEditTennisPlayerDialog 
         tennisTeamId={_id}
-        onDismiss={() => setShowAddPlayersTeamsDialog(false)}
+        onDismiss={() => {
+          setShowAddPlayersTeamsDialog(false);
+        }}
         onTennisPlayerSaved={(newTennisPlayer) => {
           setTennisPlayers([...tennisPlayers, newTennisPlayer]);
           setShowAddPlayersTeamsDialog(false);
+        }}
+      />
+    }
+
+    {
+      tennisPlayerToEdit && 
+      <AddEditTennisPlayerDialog 
+        tennisTeamId={_id}
+        tennisPlayerToEdit={tennisPlayerToEdit}
+        onDismiss={() => setTennisPlayerToEdit(null)}
+        onTennisPlayerSaved={(updatedTennisPlayer) => {
+          setTennisPlayers(tennisPlayers.map(existingTennisPlayer => existingTennisPlayer._id === updatedTennisPlayer._id ? updatedTennisPlayer : existingTennisPlayer ));
+          setTennisPlayerToEdit(null);
         }}
       />
     }

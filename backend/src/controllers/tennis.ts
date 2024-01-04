@@ -216,3 +216,74 @@ export const createTennisPlayer: RequestHandler<unknown, unknown, CreateTennisPL
         next(error);
     }
 };
+
+// Update Tennis Player
+interface UpdateTennisPlayerParams {
+    tennisTeamId: string,
+    tennisPlayerId: string,
+}
+
+interface UpdateTennisPlayerBody {
+    playerFirstName?: string,
+    playerSecondName?: string,
+    dateOfBirth?: Date,
+    playerNote?: string,
+    playerScore?: number,
+    playerWon?: number,
+    playerLost?: number,
+}
+
+export const updateTennisPlayer: RequestHandler<UpdateTennisPlayerParams, unknown, UpdateTennisPlayerBody, unknown> = async (req, res, next) => {
+    const tennisTeamId = req.params.tennisTeamId;
+    const tennisPlayerId = req.params.tennisPlayerId
+    const newPlayerFirstName = req.body.playerFirstName;
+    const newPlayerSecondName = req.body.playerSecondName;
+    const newDateOfBirth = req.body.dateOfBirth;
+    const newPlayerNote = req.body.playerNote;
+    const newPlayerScore = req.body.playerScore;
+    const newPlayerWon = req.body.playerWon;
+    const newPlayerLost = req.body.playerLost
+    const authenticatedUserId = req.session.userId;
+    
+    try {
+        assertIsDefined(authenticatedUserId);
+
+        if (!mongoose.isValidObjectId(tennisTeamId && tennisPlayerId)) {
+            throw createHttpError(400, "Invalid Tennis Team or Tennis player id");
+        }
+
+        if (!newPlayerFirstName && !newPlayerSecondName && newDateOfBirth) {
+            throw createHttpError(400, "Tennis Team must have a First Name, Second Name and Date of birth");
+        }
+
+        const tennisTeam = await TennisModel.findById(tennisTeamId).exec();
+
+        if (!tennisTeam) {
+            throw createHttpError(404, "Tennis Team not found");
+        }
+
+        if (!tennisTeam.userId.equals(authenticatedUserId)) {
+            throw createHttpError(401, "You cannot access this Tennis Team");
+        }
+
+        const tennisPlayer = await TennisPlayerModel.findById(tennisPlayerId).exec();
+
+        if (!tennisPlayer) {
+            throw createHttpError(404, "Tennis Player not found");
+        }
+
+        tennisPlayer.playerFirstName = newPlayerFirstName || tennisPlayer.playerFirstName;
+        tennisPlayer.playerSecondName = newPlayerSecondName || tennisPlayer.playerSecondName;
+        tennisPlayer.dateOfBirth = newDateOfBirth || tennisPlayer.dateOfBirth;
+        tennisPlayer.playerNote = newPlayerNote || tennisPlayer.playerNote;
+        tennisPlayer.playerScore = newPlayerScore || tennisPlayer.playerScore;
+        tennisPlayer.playerWon = newPlayerWon || tennisPlayer.playerWon;
+        tennisPlayer.playerLost = newPlayerLost || tennisPlayer.playerLost;
+
+        const updateTennisPlayer = await tennisPlayer.save();
+
+        res.status(200).json(updateTennisPlayer);
+    } catch (error) {
+        next(error);
+    }
+};
