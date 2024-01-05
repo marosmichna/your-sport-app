@@ -287,3 +287,40 @@ export const updateTennisPlayer: RequestHandler<UpdateTennisPlayerParams, unknow
         next(error);
     }
 };
+
+// delete Tennis Player
+export const deleteTennisPlayer: RequestHandler = async (req, res, next) => {
+    const tennisTeamId = req.params.tennisTeamId;
+    const tennisPlayerId = req.params.tennisPlayerId
+    const authenticatedUserId = req.session.userId;
+
+    try {
+        assertIsDefined(authenticatedUserId);
+
+        if (!mongoose.isValidObjectId(tennisTeamId && tennisPlayerId)) {
+            throw createHttpError(400, "Invalid Tennis Team or Tennis Player id");
+        }
+
+        const tennisTeam = await TennisModel.findById(tennisTeamId).exec();
+
+        if (!tennisTeam) {
+            throw createHttpError(404, "Tennis Team not found");
+        }
+
+        if (!tennisTeam.userId.equals(authenticatedUserId)) {
+            throw createHttpError(401, "You cannot access this Tennis Team");
+        }
+
+        const tennisPlayer = await TennisPlayerModel.findById(tennisPlayerId).exec();
+
+        if (!tennisPlayer) {
+            throw createHttpError(404, "Tennis Player not found");
+        }
+
+        await tennisPlayer.deleteOne();
+
+        res.sendStatus(204);
+    } catch (error) {
+        next();
+    }
+};

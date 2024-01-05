@@ -3,6 +3,7 @@ import { User } from '../../models/user';
 import { useLocation } from 'react-router';
 import { Button, Container, Spinner, Table } from 'react-bootstrap';
 import { TennisPlayer as TennisPlayerModel } from '../../models/tennis';
+import { TennisTeam as TennisTeamModel } from '../../models/tennis';
 import * as SportApi from "../../network/sports_api";
 import AddEditTennisPlayerDialog from '../../components/Tennis/AddEditTennisPlayerDialog';
 import { formatBirthDate } from "../../utils/formatDate"
@@ -46,7 +47,19 @@ const TennisTeamDetailPage = ({ loggedInUser }: TennisTeamDetailPageProps) => {
       }
     }
     loadTennisPlayers();
-  }, [])
+  }, []);
+
+  async function deleteTennisPlayer(tennisTeam: TennisTeamModel, tennisPlayer: TennisPlayerModel) {
+    try {
+      await SportApi.deleteTennisPlayer(tennisTeam._id, tennisPlayer._id);
+      setTennisPlayers(tennisPlayers.filter(existingTennisPlayer => existingTennisPlayer._id !== tennisPlayer._id));
+    } catch (error) {
+      console.error(error);
+      alert(error);
+    }
+  } {
+    
+  }
 
   const handleEditClick = (tennisPlayer: TennisPlayerModel) => {
     setTennisPlayerToEdit(tennisPlayer);
@@ -85,6 +98,11 @@ const TennisTeamDetailPage = ({ loggedInUser }: TennisTeamDetailPageProps) => {
                   onClick={() => handleEditClick(tennisPlayer)}
                 >
                   Update
+                </Button>
+                <Button 
+                  onClick={() => deleteTennisPlayer(state, tennisPlayer)}
+                >
+                  Delete
                 </Button>
             </tr>
           </tbody>      

@@ -24,4 +24,6 @@ router.post("/team/:tennisTeamId", TennisController.createTennisPlayer);
 
 router.patch("/team/:tennisTeamId/:tennisPlayerId", TennisController.updateTennisPlayer);
 
+router.delete("/team/:tennisTeamId/:tennisPlayerId", TennisController.deleteTennisPlayer);
+
 export default router;

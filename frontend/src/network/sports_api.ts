@@ -174,3 +174,8 @@ export async function updateTennisPlayer(tennisTeamId: string, tennisPlayerId: s
         });
     return response.json();
 }
+
+// Delete Tennis Player
+export async function deleteTennisPlayer(tennisTeamId: string, tennisPlayerId: string) {
+    await fetchData(`/your-sport/tennis/team/${tennisTeamId}/${tennisPlayerId}`, { method: "DELETE" });
+}
